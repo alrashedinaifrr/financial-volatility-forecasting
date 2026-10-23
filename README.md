@@ -1,68 +1,114 @@
-Cross-Market Volatility Forecasting
-S&P 500 vs. Saudi TASI | Statistical Modeling & Machine Learning
-An applied, reproducible financial data science project examining one-trading-session-ahead squared log-return forecasts for the S&P 500 and Saudi TASI indices. It compares conventional volatility estimators with machine-learning models under chronological out-of-sample evaluation.
-> **Scope:** This is a methodological forecasting comparison, **not** a trading strategy, a forecast of directly observed latent volatility, or evidence that any model is universally superior.
-At a glance
-Component	Implementation
-Markets	S&P 500 (US) and TASI (Saudi Arabia)
-Forecast target	Next-session squared log return (a noisy volatility proxy)
-Models	20-session rolling variance (RV20), EWMA, Gaussian GARCH(1,1), Random Forest, histogram gradient boosting
-Validation	Chronological expanding-window evaluation; three out-of-sample folds per market
-Metrics	QLIKE (primary; lower is better) and MSE
-Additional analyses	Moving-block bootstrap (exploratory), sensitivity checks, descriptive cross-market transfer
-Tools	Python, pandas, NumPy, SciPy, scikit-learn, pytest; external `arch` cross-check
-Results: out-of-sample QLIKE
-The table reports the lowest QLIKE in each fold, selected descriptively from the evaluated models. Lower scores indicate better performance on this metric; this table does not establish statistical significance or universal superiority.
-Market	Fold	Best model	QLIKE
-S&P 500	1	EWMA	-8.6829
-S&P 500	2	GARCH(1,1)	-8.6069
-S&P 500	3	Random Forest	-8.3458
-Saudi TASI	1	GARCH(1,1)	-8.8989
-Saudi TASI	2	EWMA	-8.9573
-Saudi TASI	3	GARCH(1,1)	-8.4717
-Full fold-level QLIKE and MSE values are available in `results_final/fold_scores.csv`. Scores across different markets or folds should not be treated as directly comparable measures of market predictability.
-S&P 500: model comparison by fold
-![S&P 500 fold-level QLIKE comparison](results_final/SP500_fold_qlike.png)
-Saudi TASI: model comparison by fold
-![Saudi TASI fold-level QLIKE comparison](results_final/TASI_fold_qlike.png)
-Key findings
-Model rankings are regime- and sample-dependent. EWMA, GARCH, and Random Forest each lead at least one evaluated fold; no single model dominates across both markets.
-Simple statistical baselines remain competitive. Greater model complexity does not guarantee lower out-of-sample QLIKE.
-Cross-market transfer is exploratory. Training a model on one market and evaluating it on the other is a descriptive robustness exercise, not evidence of causal information transfer. See `results_final/aligned_transfer.csv`.
-Uncertainty matters. Moving-block bootstrap comparisons are exploratory and have not been adjusted for multiple comparisons. See `results_final/rf_vs_ewma_bootstrap.csv`.
-Model validation and audit
-Automated tests cover the GARCH recursion, temporal boundary handling, prevention of future-target leakage, and other implementation checks; see `tests/` and `VALIDATION_STATUS.md`.
-The project owner executed the external `arch` parameter-estimation cross-check in Google Colab for both markets; both external optimizers reported convergence. The reported coefficients and comparison details are in `EXTERNAL_ARCH_RESULTS.csv` and `EXTERNAL_VALIDATION.md`.
-The `arch` comparison is not proof of identical one-step forecasts or exact equivalence between estimation implementations.
-Repository structure
+# Cross-Market Volatility Forecasting
+
+### S&P 500 vs. Saudi TASI | Statistical Modeling & Machine Learning
+
+A reproducible financial data science portfolio project comparing **one-trading-session-ahead squared log-return forecasts** for the S&P 500 (United States) and TASI (Saudi Arabia). The project evaluates statistical volatility estimators alongside machine-learning models using chronological out-of-sample testing.
+
+> **Scope:** This is a methodological forecasting comparison—not a trading strategy, a forecast of directly observed latent volatility, or evidence that any model is universally superior.
+
+## Project at a glance
+
+| Component | Description |
+|---|---|
+| Markets | S&P 500 (US) and TASI (Saudi Arabia) |
+| Forecast target | Next-session squared log return (a noisy volatility proxy) |
+| Statistical models | 20-session rolling variance (RV20), EWMA, Gaussian GARCH(1,1) |
+| Machine learning | Random Forest, histogram gradient boosting |
+| Evaluation | Three chronological expanding-window folds per market |
+| Metrics | QLIKE (primary; lower is better) and mean squared error (MSE) |
+| Additional analyses | Exploratory moving-block bootstrap, sensitivity checks, descriptive cross-market transfer |
+| Tools | Python, pandas, NumPy, SciPy, scikit-learn, pytest; external `arch` check |
+
+## Out-of-sample results
+
+The following table reports the **lowest QLIKE within each market and evaluation fold**, selected descriptively from the models evaluated. **Lower QLIKE is better.** These comparisons do not establish statistical significance or general superiority.
+
+| Market | Fold | Best model | QLIKE |
+|---|---:|---|---:|
+| S&P 500 | 1 | EWMA | -8.6829 |
+| S&P 500 | 2 | GARCH(1,1) | -8.6069 |
+| S&P 500 | 3 | Random Forest | -8.3458 |
+| Saudi TASI | 1 | GARCH(1,1) | -8.8989 |
+| Saudi TASI | 2 | EWMA | -8.9573 |
+| Saudi TASI | 3 | GARCH(1,1) | -8.4717 |
+
+Full model-by-model scores and MSE values: [`results_final/fold_scores.csv`](results_final/fold_scores.csv).
+
+### S&P 500: QLIKE by evaluation fold
+
+![S&P 500 model comparison across evaluation folds](results_final/SP500_fold_qlike.png)
+
+### Saudi TASI: QLIKE by evaluation fold
+
+![Saudi TASI model comparison across evaluation folds](results_final/TASI_fold_qlike.png)
+
+> Scores from different markets or evaluation folds should not be interpreted as direct comparisons of market predictability. The underlying return distributions and test windows differ.
+
+## Key findings
+
+- **Model rankings depend on the market and test period.** EWMA, GARCH, and Random Forest each lead in at least one fold; no model dominates every evaluation.
+- **Simple statistical benchmarks remain competitive.** Additional machine-learning complexity does not guarantee better out-of-sample QLIKE.
+- **Cross-market transfer is exploratory.** Training on one market and evaluating on another is a descriptive robustness exercise, not evidence of causal information transfer. See [`results_final/aligned_transfer.csv`](results_final/aligned_transfer.csv).
+- **Uncertainty matters.** Moving-block bootstrap results are exploratory and have not been adjusted for multiple comparisons. See [`results_final/rf_vs_ewma_bootstrap.csv`](results_final/rf_vs_ewma_bootstrap.csv).
+
+## Model validation and audit
+
+Automated tests address GARCH recursion, temporal boundary handling, prevention of future-target leakage, and other implementation checks. The project owner also executed an **external GARCH parameter-estimation comparison using Python's `arch` library in Google Colab**; both external optimizations reported convergence.
+
+The external comparison supports the numerical plausibility of the implementation, **but does not establish exact equivalence** of parameter estimates, conditional variance paths, one-step forecasts, or native likelihood conventions.
+
+- [External validation notes](EXTERNAL_VALIDATION.md)
+- [Recorded external comparison results](EXTERNAL_ARCH_RESULTS.csv)
+- [Validation status and scope](VALIDATION_STATUS.md)
+- [Technical report and limitations](TECHNICAL_REPORT.md)
+
+## Repository structure
+
 ```text
 .
 ├── README.md
 ├── requirements.txt
-├── src/                      # Data preparation, modeling and validation
-├── tests/                    # Automated tests
-├── results_final/            # Fold scores, predictions, figures and diagnostics
-├── TECHNICAL_REPORT.md       # Methods, results and limitations
-├── EXTERNAL_VALIDATION.md    # Third-party GARCH estimation check
-├── EXTERNAL_ARCH_RESULTS.csv # Recorded comparison results
-└── VALIDATION_STATUS.md      # Validation scope and status
+├── src/                       # Data preparation, modeling, validation
+├── tests/                     # Automated tests
+├── results_final/             # Model scores, predictions, figures
+├── TECHNICAL_REPORT.md        # Methods, results, limitations
+├── EXTERNAL_VALIDATION.md     # Third-party GARCH estimation check
+├── EXTERNAL_ARCH_RESULTS.csv  # Recorded comparison results
+└── VALIDATION_STATUS.md       # Validation scope and status
 ```
-Reproduce
-Use Python 3.10+ from the repository root:
+
+## Reproduce the analysis
+
+Use **Python 3.10+** and run the following from the repository root:
+
 ```bash
 python -m pip install -r requirements.txt
 python -m pytest -q tests
 python src/portfolio_v7.py
 ```
-Data requirement: Provide `data/sp500.csv` and `data/tasi.csv`, each with `Date` and `Close` columns. Source prices are not included in this public repository because redistribution rights have not been established. Exact replication of the reported values requires the same input prices and compatible dependency versions. The repository therefore contains code, tests and recorded outputs, but is not fully self-contained for exact numerical reproduction.
-To run the optional external GARCH estimator check in a connected environment:
+
+### Data requirements
+
+The analysis expects two CSV files:
+
+- `data/sp500.csv`
+- `data/tasi.csv`
+
+Each file must contain **`Date`** and **`Close`** columns; the analysis sorts dates internally. Raw market price data are **not included in this public repository** because redistribution rights have not been established. Exact numerical reproduction requires matching source prices and compatible dependency versions. The public repository therefore contains code, tests, and recorded outputs, but is **not fully self-contained for exact reproduction**.
+
+To run the optional third-party GARCH estimator check in an environment with network access:
+
 ```bash
 python -m pip install arch
 python src/verify_with_arch.py
 ```
-Limitations
-Squared daily returns are noisy proxies for unobserved conditional variance.
-Market holidays, different trading calendars and market structures complicate cross-market interpretation.
-Model selection and sensitivity checks are exploratory; reported bootstrap intervals are not multiplicity-adjusted.
-Results are historical and should not be interpreted as investment advice or out-of-sample trading profitability.
-For additional methodology and limitations, read `TECHNICAL_REPORT.md`.
+
+## Limitations
+
+- Squared daily log returns are noisy proxies for unobserved conditional volatility.
+- Market holidays, different trading calendars, and market structures complicate cross-market interpretation.
+- Model selection and sensitivity analyses are exploratory; bootstrap intervals are not multiplicity-adjusted.
+- These historical results are **not investment advice** or evidence of out-of-sample trading profitability.
+- The external `arch` comparison confirms successful independent optimizer execution, **not identical one-step forecasts**.
+
+For detailed methods and caveats, read the [technical report](TECHNICAL_REPORT.md).
