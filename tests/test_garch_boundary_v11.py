@@ -40,8 +40,11 @@ def test_boundary_origin_has_known_return_only():
         state=w+a*(100*r[idx])**2+b*state
         np.testing.assert_allclose(state,reference_filter(r[:idx+2]*100,theta)[-1],rtol=1e-10)
 
-def test_training_target_is_available_at_cutoff():
-    data=Path(__file__).resolve().parents[1]/'data'/'sp500.csv'
+def test_training_target_is_available_at_cutoff(tmp_path):
+    dates=pd.bdate_range('2020-01-01',periods=800)
+    prices=100*np.exp(np.cumsum(np.sin(np.arange(800)/17)*.003+.0001))
+    data=tmp_path/'prices.csv'
+    pd.DataFrame({'Date':dates,'Close':prices}).to_csv(data,index=False)
     x=prepare(data)
     lo=int(len(x)*.7)
     train=x.iloc[:lo-1];test=x.iloc[lo:]

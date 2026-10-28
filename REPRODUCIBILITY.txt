@@ -1,2 +1,25 @@
-Fresh V15 run of `python src/portfolio_v7.py` completed with exit code 0.
+Reproduce from the repository root:
 
+  python -m pip install -r requirements.txt
+  python -m pytest -q tests
+  python src/portfolio_v7.py --data-dir data --output-dir results_final
+
+Required local inputs:
+
+  data/sp500.csv
+  data/tasi.csv
+
+Each CSV must contain Date and Close columns. The raw price files are not
+distributed in this repository. Obtain them from a source whose terms allow
+your use, preserve the files locally, and compare their SHA-256 values with
+results_final/run_metadata.json when reproducing a recorded run.
+
+The run writes model scores, predictions, cross-market transfer results,
+RF-versus-EWMA intervals, all pairwise QLIKE comparisons with Holm-adjusted
+p-values, figures, and run_metadata.json. The pairwise intervals are pointwise
+and exploratory. The metadata records input hashes, row counts, fold settings,
+and package versions.
+
+The bootstrap intervals are exploratory and do not account for multiple
+comparisons. Reported results do not establish a universal winning model or
+trading profitability.
