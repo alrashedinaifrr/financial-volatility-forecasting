@@ -16,7 +16,7 @@ A reproducible financial data science portfolio project comparing **one-trading-
 | Machine learning | Random Forest, histogram gradient boosting |
 | Evaluation | Three chronological expanding-window folds per market |
 | Metrics | QLIKE (primary; lower is better) and mean squared error (MSE) |
-| Additional analyses | Exploratory moving-block bootstrap, sensitivity checks, descriptive cross-market transfer |
+| Additional analyses | Moving-block bootstrap contrasts with Holm correction, sensitivity checks, descriptive cross-market transfer |
 | Tools | Python, pandas, NumPy, SciPy, scikit-learn, pytest; external `arch` check |
 
 ## Out-of-sample results
@@ -49,7 +49,7 @@ Full model-by-model scores and MSE values: [`results_final/fold_scores.csv`](res
 - **Model rankings depend on the market and test period.** EWMA, GARCH, and Random Forest each lead in at least one fold; no model dominates every evaluation.
 - **Simple statistical benchmarks remain competitive.** Additional machine-learning complexity does not guarantee better out-of-sample QLIKE.
 - **Cross-market transfer is exploratory.** Training on one market and evaluating on another is a descriptive robustness exercise, not evidence of causal information transfer. See [`results_final/aligned_transfer.csv`](results_final/aligned_transfer.csv).
-- **Uncertainty matters.** Moving-block bootstrap results are exploratory and have not been adjusted for multiple comparisons. See [`results_final/rf_vs_ewma_bootstrap.csv`](results_final/rf_vs_ewma_bootstrap.csv).
+- **Most pairwise differences remain uncertain.** All 60 within-fold QLIKE contrasts are now reported with circular moving-block bootstrap intervals and project-wide Holm-adjusted p-values. After correction, `HGB_log` has higher QLIKE than several alternatives in S&P 500 folds 1–2 and TASI fold 1; most other pairwise differences are inconclusive. Intervals remain pointwise and exploratory, and only three test windows are available. See [`results_final/pairwise_qlike_comparisons.csv`](results_final/pairwise_qlike_comparisons.csv). The earlier RF-vs-EWMA intervals remain as an unadjusted descriptive analysis.
 
 ## Model validation and audit
 
@@ -77,6 +77,10 @@ The external comparison supports the numerical plausibility of the implementatio
 └── VALIDATION_STATUS.md       # Validation scope and status
 ```
 
+## Run in Google Colab
+
+Open [Volatility_Forecasting_Colab.ipynb](Volatility_Forecasting_Colab.ipynb) in Colab. It clones the public repository, reads price CSVs from Drive, runs the tests and analysis, and downloads a results archive.
+
 ## Reproduce the analysis
 
 Use **Python 3.10+** and run the following from the repository root:
@@ -84,7 +88,7 @@ Use **Python 3.10+** and run the following from the repository root:
 ```bash
 python -m pip install -r requirements.txt
 python -m pytest -q tests
-python src/portfolio_v7.py
+python src/portfolio_v7.py --data-dir data --output-dir results_final
 ```
 
 ### Data requirements
@@ -94,7 +98,7 @@ The analysis expects two CSV files:
 - `data/sp500.csv`
 - `data/tasi.csv`
 
-Each file must contain **`Date`** and **`Close`** columns; the analysis sorts dates internally. Raw market price data are **not included in this public repository** because redistribution rights have not been established. Exact numerical reproduction requires matching source prices and compatible dependency versions. The public repository therefore contains code, tests, and recorded outputs, but is **not fully self-contained for exact reproduction**.
+Each file must contain **`Date`** and **`Close`** columns; the analysis sorts dates internally. Raw market price data are **not included in this public repository** because redistribution rights have not been established. Exact numerical reproduction requires matching source prices and compatible dependency versions. Each run writes `run_metadata.json` with input row counts, SHA-256 hashes, fold settings, and installed package versions so the local inputs and environment can be identified. It also writes `pairwise_qlike_comparisons.csv`, comparing every model pair on identical dates and correcting p-values across markets and folds with Holm's method. The percentile intervals are pointwise, not simultaneous. The public repository therefore contains code, tests, and recorded outputs, but is **not fully self-contained for exact reproduction**.
 
 To run the optional third-party GARCH estimator check in an environment with network access:
 
@@ -107,7 +111,7 @@ python src/verify_with_arch.py
 
 - Squared daily log returns are noisy proxies for unobserved conditional volatility.
 - Market holidays, different trading calendars, and market structures complicate cross-market interpretation.
-- Model selection and sensitivity analyses are exploratory; bootstrap intervals are not multiplicity-adjusted.
+- Model selection and sensitivity analyses are exploratory; the separate RF-vs-EWMA bootstrap intervals are not multiplicity-adjusted. The all-pairs comparison uses project-wide Holm-adjusted p-values, while its confidence intervals remain pointwise.
 - These historical results are **not investment advice** or evidence of out-of-sample trading profitability.
 - The external `arch` comparison confirms successful independent optimizer execution, **not identical one-step forecasts**.
 
