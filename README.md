@@ -1,5 +1,7 @@
 # Cross-Market Volatility Forecasting
 
+> **Scope of the work sample.** This repository documents the original five-model benchmark. The application work sample also reports an exploratory mean-targeted boosting model (`HGB_mean`) and sensitivity to bootstrap block length. Those extensions are not included in this repository snapshot; the reproduction commands below apply to the original benchmark.
+
 ### S&P 500 vs. Saudi TASI | Statistical Modeling & Machine Learning
 
 A reproducible financial data science portfolio project comparing **one-trading-session-ahead squared log-return forecasts** for the S&P 500 (United States) and TASI (Saudi Arabia). The project evaluates statistical volatility estimators alongside machine-learning models using chronological out-of-sample testing.
