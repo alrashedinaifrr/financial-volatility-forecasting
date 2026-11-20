@@ -1,0 +1,25 @@
+market,candidates,statistic,block,removed,included,id
+SP500,9,Tmax,5,Log target,8,SP500_all_nine_Tmax_k5
+SP500,9,Tmax,10,Log target,8,SP500_all_nine_Tmax_k10
+SP500,9,Tmax,20,Log target,8,SP500_all_nine_Tmax_k20
+SP500,9,TR,5,Log target,8,SP500_all_nine_TR_k5
+SP500,9,TR,10,Log target,8,SP500_all_nine_TR_k10
+SP500,9,TR,20,Log target,8,SP500_all_nine_TR_k20
+SP500,8,Tmax,5,Log target,7,SP500_exclude_direct_mean_Tmax_k5
+SP500,8,Tmax,10,Log target,7,SP500_exclude_direct_mean_Tmax_k10
+SP500,8,Tmax,20,Log target,7,SP500_exclude_direct_mean_Tmax_k20
+SP500,8,TR,5,Log target,7,SP500_exclude_direct_mean_TR_k5
+SP500,8,TR,10,Log target,7,SP500_exclude_direct_mean_TR_k10
+SP500,8,TR,20,Log target,7,SP500_exclude_direct_mean_TR_k20
+TASI,9,Tmax,5,None,9,TASI_all_nine_Tmax_k5
+TASI,9,Tmax,10,None,9,TASI_all_nine_Tmax_k10
+TASI,9,Tmax,20,None,9,TASI_all_nine_Tmax_k20
+TASI,9,TR,5,None,9,TASI_all_nine_TR_k5
+TASI,9,TR,10,Log target,8,TASI_all_nine_TR_k10
+TASI,9,TR,20,Log target,8,TASI_all_nine_TR_k20
+TASI,8,Tmax,5,Log target,7,TASI_exclude_direct_mean_Tmax_k5
+TASI,8,Tmax,10,Log target,7,TASI_exclude_direct_mean_Tmax_k10
+TASI,8,Tmax,20,Log target,7,TASI_exclude_direct_mean_Tmax_k20
+TASI,8,TR,5,None,8,TASI_exclude_direct_mean_TR_k5
+TASI,8,TR,10,Log target,7,TASI_exclude_direct_mean_TR_k10
+TASI,8,TR,20,Log target,7,TASI_exclude_direct_mean_TR_k20

@@ -1,0 +1,25 @@
+market,candidate_set,statistic,k,R_included,R_excluded,R_B,R_status,Python_included,agreement,Python_B
+SP500,all_nine,Tmax,5,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,all_nine,Tmax,10,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,all_nine,Tmax,20,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,all_nine,TR,5,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+SP500,all_nine,TR,10,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+SP500,all_nine,TR,20,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+SP500,exclude_direct_mean,Tmax,5,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,exclude_direct_mean,Tmax,10,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,exclude_direct_mean,Tmax,20,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+SP500,exclude_direct_mean,TR,5,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+SP500,exclude_direct_mean,TR,10,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+SP500,exclude_direct_mean,TR,20,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+TASI,all_nine,Tmax,5,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,all_nine,Tmax,10,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,all_nine,Tmax,20,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,,4999,OK,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,all_nine,TR,5,Direct mean; EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,,4999,OK,,,
+TASI,all_nine,TR,10,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+TASI,all_nine,TR,20,Direct mean; EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+TASI,exclude_direct_mean,Tmax,5,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,exclude_direct_mean,Tmax,10,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,exclude_direct_mean,Tmax,20,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,True,3999.0
+TASI,exclude_direct_mean,TR,5,EWMA; GARCH; HAR-SR2; Log target; Poisson; RF; RV20; Rescaled log,,4999,OK,,,
+TASI,exclude_direct_mean,TR,10,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,
+TASI,exclude_direct_mean,TR,20,EWMA; GARCH; HAR-SR2; Poisson; RF; RV20; Rescaled log,Log target,4999,OK,,,

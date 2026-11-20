@@ -1,0 +1,25 @@
+"id","market","candidate_set","statistic","k","B","status","included","excluded","error","elapsed_seconds"
+"SP500_all_nine_Tmax_k5","SP500","all_nine","Tmax",5,4999,"OK","RV20; Rescaled log; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.264
+"SP500_all_nine_Tmax_k10","SP500","all_nine","Tmax",10,4999,"OK","RV20; Rescaled log; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.291
+"SP500_all_nine_Tmax_k20","SP500","all_nine","Tmax",20,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.325
+"SP500_all_nine_TR_k5","SP500","all_nine","TR",5,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.404
+"SP500_all_nine_TR_k10","SP500","all_nine","TR",10,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.444
+"SP500_all_nine_TR_k20","SP500","all_nine","TR",20,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; Direct mean; EWMA; GARCH; Poisson","Log target","",0.403
+"SP500_exclude_direct_mean_Tmax_k5","SP500","exclude_direct_mean","Tmax",5,4999,"OK","RV20; Rescaled log; RF; HAR-SR2; EWMA; GARCH; Poisson","Log target","",0.445
+"SP500_exclude_direct_mean_Tmax_k10","SP500","exclude_direct_mean","Tmax",10,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; EWMA; GARCH; Poisson","Log target","",0.463
+"SP500_exclude_direct_mean_Tmax_k20","SP500","exclude_direct_mean","Tmax",20,4999,"OK","Rescaled log; RV20; RF; HAR-SR2; EWMA; GARCH; Poisson","Log target","",0.506
+"SP500_exclude_direct_mean_TR_k5","SP500","exclude_direct_mean","TR",5,4999,"OK","RV20; Rescaled log; RF; HAR-SR2; EWMA; GARCH; Poisson","Log target","",0.404
+"SP500_exclude_direct_mean_TR_k10","SP500","exclude_direct_mean","TR",10,4999,"OK","RV20; Rescaled log; RF; HAR-SR2; EWMA; GARCH; Poisson","Log target","",0.432
+"SP500_exclude_direct_mean_TR_k20","SP500","exclude_direct_mean","TR",20,4999,"OK","Rescaled log; RV20; RF; EWMA; HAR-SR2; GARCH; Poisson","Log target","",0.28
+"TASI_all_nine_Tmax_k5","TASI","all_nine","Tmax",5,4999,"OK","Direct mean; Log target; Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","","",0.257000000000001
+"TASI_all_nine_Tmax_k10","TASI","all_nine","Tmax",10,4999,"OK","Direct mean; Log target; Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","","",0.25
+"TASI_all_nine_Tmax_k20","TASI","all_nine","Tmax",20,4999,"OK","Direct mean; Log target; Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","","",0.288
+"TASI_all_nine_TR_k5","TASI","all_nine","TR",5,4999,"OK","Log target; Poisson; Rescaled log; Direct mean; EWMA; HAR-SR2; RV20; GARCH; RF","","",0.29
+"TASI_all_nine_TR_k10","TASI","all_nine","TR",10,4999,"OK","Poisson; Rescaled log; Direct mean; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.286
+"TASI_all_nine_TR_k20","TASI","all_nine","TR",20,4999,"OK","Poisson; Rescaled log; Direct mean; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.307
+"TASI_exclude_direct_mean_Tmax_k5","TASI","exclude_direct_mean","Tmax",5,4999,"OK","Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.293
+"TASI_exclude_direct_mean_Tmax_k10","TASI","exclude_direct_mean","Tmax",10,4999,"OK","Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.271999999999999
+"TASI_exclude_direct_mean_Tmax_k20","TASI","exclude_direct_mean","Tmax",20,4999,"OK","Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.276000000000001
+"TASI_exclude_direct_mean_TR_k5","TASI","exclude_direct_mean","TR",5,4999,"OK","Log target; Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","","",0.383999999999999
+"TASI_exclude_direct_mean_TR_k10","TASI","exclude_direct_mean","TR",10,4999,"OK","Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.258000000000001
+"TASI_exclude_direct_mean_TR_k20","TASI","exclude_direct_mean","TR",20,4999,"OK","Poisson; Rescaled log; EWMA; HAR-SR2; RV20; GARCH; RF","Log target","",0.261000000000001
