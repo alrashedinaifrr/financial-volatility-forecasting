@@ -1,6 +1,6 @@
 # Cross-Market Volatility Forecasting
 
-> **Scope of the work sample.** This repository documents the original five-model benchmark. The application work sample also reports an exploratory mean-targeted boosting model (`HGB_mean`) and sensitivity to bootstrap block length. Those extensions are not included in this repository snapshot; the reproduction commands below apply to the original benchmark.
+> **Scope of the work sample.** The historical five-model benchmark is preserved below. The [audited 2026 research-portfolio extension](portfolio_2026/README.md) includes HAR-SR2, an aligned nine-model 2026 forecast panel, paired QLIKE/Diebold–Mariano comparisons, and independent official-R Model Confidence Set results. The 2026 comparisons are retrospective and exploratory; source vendor market-price exports are not redistributed.
 
 ### S&P 500 vs. Saudi TASI | Statistical Modeling & Machine Learning
 
