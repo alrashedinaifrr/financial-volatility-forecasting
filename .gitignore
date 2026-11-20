@@ -1,0 +1,22 @@
+# Third-party market price exports are local inputs, not redistributed.
+data/
+portfolio_2026/data/
+portfolio_2026/code/study2/input/
+
+# Locally regenerated outputs; the committed audited result tables are not ignored.
+results_study2_2026/
+portfolio_2026/results/recomputed_*/
+portfolio_2026/results/nine_model_inference_block_*/
+portfolio_2026/results/nine_model_without_direct_mean_block_*/
+portfolio_2026/results/new_R_MCS_audit/
+
+# Python environments, caches, credentials and ad-hoc archives.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+.env
+.env.*
+*.zip
+.DS_Store
