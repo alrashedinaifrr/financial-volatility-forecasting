@@ -19,7 +19,7 @@ This directory extends (and does not erase) the original five-model S&P 500/TASI
 - `results/official_R_nine_model/`: official CRAN MCS result tables and run/session logs supplied from an actual R run. The complete .rds archive is retained separately in the project-level source bundle; this GitHub subfolder publishes the audit tables rather than the R objects.
 - `code/study2/`: actual fitting, HAR, expanded comparison, MCS R and verification scripts.
 
-This public repository deliberately does **not** redistribute original third-party historical market-price exports. To refit, supply the same archived/complete `Date,Close` price histories and verify trading-date overlap. The derived prediction table lets researchers independently recompute QLIKE, DM and MCS without distributing those vendor source files. The rescaled Poisson formulation reproduces published results only when trained on the **original unscaled target** (not arbitrary x10,000 scaling of squared returns).
+This public repository deliberately does **not** redistribute original third-party historical market-price exports. To refit, supply the same archived/complete `Date,Close` price histories and verify trading-date overlap. The derived prediction table lets researchers independently recompute QLIKE, DM and MCS without distributing those vendor source files. The Poisson-deviance boosting specification reproduces the reported scores only when fitted on the **original unscaled squared-return target**; multiplying that target by 10,000 changes the regularized fit.
 
 ## Reproduction
 
