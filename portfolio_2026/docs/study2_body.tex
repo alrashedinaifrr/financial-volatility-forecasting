@@ -1,0 +1,586 @@
+
+\begin{center}
+{\LARGE\bfseries\color{navy} Study II. Volatility Forecasting Across Two Equity Markets}\par\vspace{7pt}
+{\normalsize Chronological evaluation, target alignment, and independent model comparison}\par\vspace{12pt}
+Naif Rawaf Hani Alrashedi\par\vspace{10pt}
+\end{center}
+\begin{center}\textbf{Abstract}\end{center}
+\noindent\textbf{Objective.} To compare one-session-ahead squared-return forecasts across the S\&P 500 and Saudi TASI, examine the influence of model training targets, and quantify uncertainty in forecast rankings.
+\textbf{Design and methods.} We evaluate statistical and machine-learning benchmarks, including a heterogeneous autoregressive squared-return model (HAR-SR2), on chronological historical blocks and a later matched-date panel of nine models. The 2026 evaluation covers 195 S\&P 500 and 188 TASI sessions. Comparisons use QLIKE and MSE, paired moving-block intervals, Diebold--Mariano tests with HAC variance and Holm adjustment, and the official R \texttt{MCS} package with candidate-set and block-length sensitivity analysis.
+\textbf{Results.} Poisson boosting achieved the lowest observed S\&P 500 mean QLIKE ($-8.5879$), narrowly ahead of GARCH ($-8.5868$). Random forest led TASI ($-8.8094$), narrowly ahead of GARCH ($-8.8079$). These rankings did not establish multiplicity-adjusted superiority. The nine-model official R MCS validation completed 24 of 24 runs; its twelve comparable $T_{\max}$ retained sets agreed with the independently implemented Python results. Model retention in TASI depended on the test statistic, bootstrap block length and presence of the extreme-loss direct-mean candidate.
+\textbf{Interpretation.} Forecast ranking is sensitive to loss, market and candidate set. The results quantify retrospective comparative performance but do not demonstrate one universally superior forecasting model.
+
+
+\textbf{Keywords:} volatility forecasting; squared returns; HAR; QLIKE; Diebold--Mariano; dependent bootstrap; model confidence set.
+
+\section{Introduction, research objectives, and hypotheses}
+Volatility forecasting requires comparing models on the same forecast origins using a loss function aligned with the prediction target. Classical GARCH and exponentially weighted methods provide interpretable benchmarks, while tree ensembles and heterogeneous autoregressive structures offer different ways to capture nonlinearities and persistence. Related evidence includes Alalmai (2026) on GARCH and EGARCH in the American and Saudi markets, Branco, Rubesam and Zevallos (2024) on realized-volatility benchmarks, and Pragadeeshwaran et al. (2026) on machine-learning volatility forecasts for US equities.
+
+We study one-session-ahead squared log returns in the S\&P 500 and Saudi TASI. At forecast origin $t$, the target is $Y_t=r_{t+1}^2$, where $r_t=\log(P_t/P_{t-1})$. Squared daily log returns are noisy indicators of the conditional second moment, rather than intraday realized variance. Forecasts are evaluated on identical target sessions within each market under quasi-likelihood loss (QLIKE) and mean squared error (MSE).
+
+\subsection{Research questions and analytical objectives}
+\begin{itemize}
+\item \textbf{RQ1 (historical comparison).} How do standard statistical and machine-learning forecasts compare across chronological evaluation blocks in both equity markets?
+\item \textbf{RQ2 (forecast target and HAR benchmark).} Does aligning a boosting objective or rescaling a log-target forecast change QLIKE, and how competitive is a heterogeneous autoregressive squared-return benchmark?
+\item \textbf{RQ3 (later-period uncertainty).} When the candidate set is expanded to nine models evaluated on the same 2026 sessions, which observed loss differences remain distinguishable under dependence-aware inference, and which models remain in a model confidence set?
+\end{itemize}
+
+The candidate set comprises RV20, EWMA, Gaussian GARCH(1,1), random forest, log-target histogram boosting, a training-rescaled log forecast, Poisson-deviance boosting, direct-mean boosting, and HAR-SR2. The historical and later-period results are presented separately because their model universes and inferential families differ.
+
+\subsection{Statistical hypotheses and evaluation criteria}\label{sec:study2_hypotheses}
+For each market and candidate set, the inferential comparisons concern differences in expected QLIKE on matched forecast dates. Pairwise Diebold--Mariano tests assess equal predictive accuracy; the model-confidence-set procedure assesses equal predictive ability over the candidates retained at each elimination step. Both are defined below.
+
+\paragraph{Paired predictive accuracy (Diebold--Mariano).}
+For market $s\in\{\mathrm{S\&P\ 500},\mathrm{TASI}\}$ and distinct forecasts
+$A,B$, let $d_{t,s}^{A,B}=L(Y_{t,s},\widehat h^A_{t,s})-
+L(Y_{t,s},\widehat h^B_{t,s})$ on the \emph{same} held-out sessions,
+where $L$ is QLIKE and $\mu_s^{A,B}=\mathbb E[d_{t,s}^{A,B}]$.
+Each two-sided equal-predictive-accuracy contrast is
+\begin{equation}\label{eq:study2_h0_dm}
+H_{0,\mathrm{DM}}^{A,B,s}:\ \mu_s^{A,B}=0
+\qquad\text{versus}\qquad
+H_{1,\mathrm{DM}}^{A,B,s}:\ \mu_s^{A,B}\neq 0.
+\end{equation}
+The HAR--EWMA comparison is one such pairwise contrast, \emph{not} a separate
+claim that HAR is uniformly better. Negative $\overline d$ favors the first
+forecast. For the expanded nine-model panel, 36 pairs per market yield 72
+DM tests, with Bartlett-HAC standard errors and Holm adjustment over the entire
+72-test family. The bootstrap 95\% intervals reported alongside them are
+\emph{pointwise}, not 72-test family-wise confidence intervals.
+
+\paragraph{Sequential model confidence set (MCS).}
+For a candidate set $\mathcal M$ in a specified market, the equal-predictive-
+ability null at a given elimination step is
+\begin{equation}\label{eq:study2_h0_mcs}
+H_{0,\mathrm{EPA}}(\mathcal M):\
+\mathbb E[L_i-L_j]=0\ \ \forall\,i,j\in\mathcal M
+\quad\text{versus}\quad
+H_{1,\mathrm{EPA}}(\mathcal M):\
+\exists\,i,j\in\mathcal M:\mathbb E[L_i-L_j]\neq0.
+\end{equation}
+Official R \texttt{MCS} tests $H_{0,\mathrm{EPA}}$ sequentially at nominal
+$\alpha=0.05$ using $T_{\max}$ or $T_R$ with dependent bootstrap resampling,
+repeating the procedure as candidates are eliminated. Model retention signifies
+\emph{failure to eliminate under that procedure}, not proof of equal accuracy,
+model superiority, or prospective predictive performance. The nine-model
+candidate set and removal of Direct Mean are reported separately, with block
+lengths 5, 10, and 20; the six-model tests remain a distinct analysis.
+
+\section{Data provenance and chronological protocol}
+\noindent\textbf{Code and data availability.} \href{https://github.com/alrashedinaifrr/financial-volatility-forecasting}{Financial Volatility Forecasting on GitHub}. The companion research archive preserves the study-specific price files, analysis scripts, matched predictions, and official R \texttt{MCS} audit outputs.\par\smallskip
+The original archived inputs contain 2,528 S\&P 500 closes (4 January 2016--22 January 2026) and 2,513 TASI closes (3 January 2016--22 January 2026). The new 2026 files supplied by the author contain three overlapping valid S\&P 500 sessions and five overlapping TASI sessions, each exactly matching the archive to the published two-decimal precision. Six non-trading/blank S\&P 500 dates from the FRED export were excluded rather than treated as zero returns. After appending observed closes, the out-of-archive evaluation comprises 195 S\&P 500 and 188 TASI sessions, with targets realized 23 January--30 October and 25 January--29 October 2026, respectively. No trading session was interpolated. The archived S\&P 500 file had five exact zero daily returns; none was reported for the archived TASI file. Source-vendor metadata and official trading calendars would be required to verify every past price adjustment and exchange closure independently.
+
+The historical evaluation uses three expanding-window blocks per market, whose test-origin counts are 247/247/247 for S\&P 500 and 245/245/246 for TASI. The later 2026 specifications are refitted on the archived origin data only: 2,466 and 2,451 training origins, with a one-origin embargo immediately before later evaluation. Fitted parameters remain constant in the later period while lagged predictors update as new returns are observed.
+
+\subsection{Historical folds and chronological separation}
+The chronological evaluation splits each market's complete supervised history at 70\%, 80\%, 90\%, and 100\% of eligible forecast origins. Each test fold was evaluated after fitting on all eligible earlier origins, with the final pre-test origin excluded from fitting. Tree-model parameters were fixed within a fold; lag-based predictors were subsequently updated using only returns observed at the current origin. This protocol separates model fitting from the held-out loss observations, though the historical folds were revisited during development.
+\begin{table}[ht]\centering\small
+\caption{Original expanding-window evaluation design (forecast origins, not target dates).}
+\begin{tabular}{llrrll}\toprule
+Market & Fold & Train $n$ & Test $n$ & First test origin & Last test origin\\\midrule
+S\&P 500 & 1 & 1,725 & 247 & 2023-02-07 & 2024-01-31\\
+ & 2 & 1,972 & 247 & 2024-02-01 & 2025-01-27\\
+ & 3 & 2,219 & 247 & 2025-01-28 & 2026-01-21\\
+TASI & 1 & 1,715 & 245 & 2023-02-09 & 2024-02-04\\
+ & 2 & 1,960 & 245 & 2024-02-05 & 2025-01-28\\
+ & 3 & 2,205 & 246 & 2025-01-29 & 2026-01-21\\\bottomrule
+\end{tabular}\end{table}
+
+\subsection{Original forecasting features and GARCH recursion}
+The historical forecast panel includes the 20-session realized-squared-return mean (RV20), exponentially weighted moving average with smoothing parameter $0.06$, Gaussian GARCH(1,1), random forest (120 trees, maximum depth six, minimum terminal size 12), and log-target histogram gradient boosting (130 iterations, at most nine leaves, L2 regularization 2). The tree specifications use nine contemporaneously available return-history features: recent absolute returns (lags 1, 2 and 5), rolling squared-return means over 5, 20 and 60 sessions, a negative-return indicator, an EWMA measure, and the log of rolling 20-session variance.
+
+For the zero-mean Gaussian GARCH benchmark, the conditional variance is updated as
+\begin{equation}\label{eq:garch-restored}
+h_{t+1}=\omega+\alpha r_t^2+\beta h_t,
+\end{equation}
+with fitted parameters constrained in the original study by positive coefficients and a stationary-type bound. The original implementation estimates the coefficients by constrained Gaussian quasi-likelihood on percentage returns, updates the conditional variance using only observed history, and converts variance forecasts to decimal-return units by dividing by $10^4$. The SLSQP fit uses $\omega>0$, $10^{-5}\le\alpha\le0.6$, $0.01\le\beta\le0.995$ and $\alpha+\beta\le0.995$, with an initial parameter guess $(0.04v,0.08,0.88)$ where $v$ denotes the percentage-return variance. The objective is the sample mean of $\log h_t+r_t^2/h_t$. The historical initialization fixes $h_1=v$; after fitting through the final available training return, the same fixed $(\omega,\alpha,\beta)$ is filtered sequentially to each 2026 forecast origin without observing its following return. The optimizer uses at most 250 iterations and a function tolerance of $10^{-9}$. The 2026 random forest retains the original 120 trees, maximum depth six, minimum leaf size twelve, and random seed 2026. No evaluation targets are used to refit any parameter. As in the earlier archived analysis, the initial state and estimator parametrization should be retained when comparing this GARCH implementation with external software; otherwise apparently different estimates may be an initialization artifact.
+
+\section{Forecast models and loss functions}
+For nonnegative $y$ and positive variance forecast $h$, the principal score is
+\begin{equation}
+\mathrm{QLIKE}(y,h)=\log h+\frac{y}{h}; \qquad \mathrm{MSE}(y,h)=(y-h)^2,
+\end{equation}
+with the same $10^{-9}$ positive forecasting floor as the archived work. Lower loss is better. Model comparisons always use the same target sessions within each market.
+
+The HAR-SR2 baseline is OLS on the daily, preceding five-session, and preceding 22-session averages of \emph{squared daily returns}:
+\begin{equation}
+\widehat h^{\mathrm{HAR}}_{t+1|t}=\max\!\left\{10^{-9},\widehat\beta_0 +\widehat\beta_d r_t^2 +\widehat\beta_w\frac{1}{5}\sum_{j=0}^4r_{t-j}^2+\widehat\beta_m\frac{1}{22}\sum_{j=0}^{21}r_{t-j}^2\right\}.
+\end{equation}
+This \textbf{is not HAR-RV}: the standard HAR-RV model uses realized variance from intraday data. Here the HAR-style architecture is placed on the same daily squared-return target as the other models. Only training-origin information is used to estimate coefficients; lagged predictors at each evaluation origin depend solely on contemporaneously available returns.
+
+The boosted models use 130 iterations, at most nine leaves, and $L_2=2$ as specified in the original comparison. Poisson boosting is fitted to the \emph{unscaled} squared-return response in the reported historical and 2026 results. This choice reproduces the recorded Poisson QLIKE values. Rescaling its training response by $10{,}000$ without changing regularization yields a different fitted model and different QLIKE values; the scaled-target variant is not included in these numerical comparisons. The log-target rescaling multipliers, calculated on forward predictions within training, are 5.8750 for S\&P 500 and 4.6896 for TASI.
+
+\section{Historical benchmark: six matched evaluation windows}
+Table~\ref{tab:historical} reports the five established benchmark QLIKE scores to four decimal places and HAR-SR2 on the same forecast origins. In three of the six blocks HAR has the lowest observed QLIKE; this is not evidence of general or statistically adjusted superiority. Historical results have been examined during model development and remain exploratory.
+
+\begin{table}[ht]
+\centering\small
+\caption{Historical mean QLIKE by market and block (smaller is better).}\label{tab:historical}
+\resizebox{\linewidth}{!}{\begin{tabular}{lrrrrrrl}\toprule
+Market/fold & EWMA & GARCH & RF & RV20 & HGB-log & HAR-SR2 & Lowest loss\\\midrule
+S\&P 500 / 1 & -8.6829 & -8.6578 & -8.6033 & -8.6647 & -5.4486 & -8.6336 & EWMA \\
+S\&P 500 / 2 & -8.5915 & -8.6069 & -8.5986 & -8.4787 & -5.4383 & -8.6079 & HAR \\
+S\&P 500 / 3 & -8.2092 & -8.3361 & -8.3458 & -8.1485 & -6.4115 & -8.3521 & HAR \\
+TASI / 1 & -8.8909 & -8.8989 & -8.8856 & -8.8656 & -7.3704 & -8.8765 & GARCH \\
+TASI / 2 & -8.9573 & -8.9523 & -8.8955 & -8.8735 & -6.9971 & -8.9166 & EWMA \\
+TASI / 3 & -8.1680 & -8.4717 & -8.4670 & -8.1045 & -6.2092 & -8.4877 & HAR \\
+\bottomrule\end{tabular}}
+\end{table}
+
+\subsection{Original-model contrast: interpretive limits}
+The six historical windows were used to estimate paired daily QLIKE loss differences between the five original forecasts. The five-benchmark comparison uses 4,000 circular moving-block bootstrap replicates with blocks of ten sessions and Holm correction over the 60 within-window model pairs. Twelve contrasts cleared the adjusted 5\% threshold; all involved high log-target boosting loss in early windows. Differences among EWMA, GARCH, RF and RV20 did not clear that project-wide adjustment. Because the HAR-inclusive candidate family differs, these five-model significance labels do not transfer to it.
+
+The distribution of loss differences is uneven and can have unusually large right tails because QLIKE contains the term $Y_t/\widehat h_t$. Therefore a low mean score is not, by itself, a guarantee of a stable, practically useful forecasting improvement. Figure~\ref{fig:historical-relative} displays four established benchmarks relative to EWMA across the historical evaluation folds.
+\begin{figure}[ht]\centering
+\includegraphics[width=.90\linewidth]{figures/study2/original_historical_relative_qlike.pdf}
+\caption{Historical benchmark losses relative to EWMA for three expanding folds in each market. Negative is better. HAR and the later 2026 period are displayed separately.}\label{fig:historical-relative}\end{figure}
+
+\FloatBarrier
+\section{Training-objective comparison}
+A central methodological issue is the relationship between the training objective and the \emph{target} elicited by the evaluation loss. For positive forecast $h$ and a nonnegative outcome $Y$, conditional expected QLIKE is
+\begin{equation}\label{eq:qlike-optimum}
+\mathbb E\{L(Y,h)\mid X\}=\log h +\frac{\mathbb E(Y\mid X)}{h},\qquad
+\frac{\partial}{\partial h}\mathbb E\{L(Y,h)\mid X\}=
+\frac{h-\mathbb E(Y\mid X)}{h^2}.
+\end{equation}
+Its optimum is the conditional mean of the squared return, provided that the mean is finite and positive. By contrast, fitting least-squares to $\log\{\max(Y,\varepsilon)\}$ and exponentiating approximates a conditional \emph{geometric} mean of the floored target; Jensen's inequality does not generally identify this with the conditional mean of $Y$. The rescaling analysis tests whether a single level adjustment explains part of the loss difference.
+
+For log-target predictions $\widehat h_i>0$ and multiplier $c>0$, mean QLIKE becomes
+\begin{equation}\label{eq:rescale-optimum}
+\overline L(c)=\log c +\frac1m\sum_{i=1}^m\log\widehat h_i+
+\frac1{cm}\sum_{i=1}^m\frac{Y_i}{\widehat h_i},
+\qquad\widehat c=\frac1m\sum_{i=1}^m\frac{Y_i}{\widehat h_i}.
+\end{equation}
+The multiplier was estimated from forward predictions inside the training sample only, with disjoint 20\% calibration blocks after training on the first 60\% and then 80\% of origins; the origin immediately preceding each internal evaluation block was omitted. After fixing $\widehat c$, the log model was refitted to the full outer training sample. The resulting multiplier is not fitted on evaluation-window targets.
+
+\begin{table}[ht]\centering\small
+\caption{Historical boosting-objective comparison. Scores apply to the indicated historical model specifications and evaluation windows, not the later 2026 test period.}
+\begin{tabular}{lrrrrr}\toprule
+Market/fold & Log target & Rescaled log & Poisson & Direct mean & $\widehat c$\\\midrule
+S\&P 500 / 1 & -5.4486 & -8.4839 & -8.5945 & -8.6545 & 7.321\\
+S\&P 500 / 2 & -5.4383 & -8.4996 & -8.5800 & -8.0387 & 6.037\\
+S\&P 500 / 3 & -6.4115 & -8.2884 & -8.2021 & 523.3308 & 6.529\\
+TASI / 1 & -7.3704 & -8.8063 & -8.7997 & -8.9021 & 4.675\\
+TASI / 2 & -6.9971 & -8.7841 & -8.8436 & -8.8879 & 4.443\\
+TASI / 3 & -6.2092 & -8.4465 & -8.4378 & 1.4863 & 4.096\\\bottomrule
+\end{tabular}\end{table}
+
+Rescaling lowered QLIKE relative to direct exponentiation in each historical block. Poisson and rescaled-log forecasts were the lower-QLIKE method in three blocks apiece when compared head-to-head, and an original benchmark still exceeded both on QLIKE in every historical block. The fit of the original log-target model had mean forecasts equal to roughly 24--37\% of the observed mean squared return, while rescaling raised its level and overshot the observed mean in five blocks. By itself, the correction did not guarantee improved mean-squared error or superior calibration across all forecast levels.
+
+\paragraph{Important implementation distinction.} The Poisson-deviance model fitted to the unscaled squared-return target is distinct from a scaled-target variant: changing the response scale while holding regularization fixed alters the effective estimation problem. All QLIKE comparisons in this section use the unscaled-target implementation stated above; scripts distinguish the two variants explicitly.
+
+\section{Cross-market transfer and GARCH implementation checks}
+\subsection{Cross-market random-forest transfer}
+Cross-market transfer is examined by fitting a random forest in one market and forecasting squared returns in the other. For each destination market, source-trained and locally trained forecasts are evaluated on \emph{the same destination sessions}. Models trained in the other market use only data available before the beginning of the destination test period. The destination split is at 80\% of the eligible history, with the final pre-test origin omitted from fitting.
+\begin{table}[ht]\centering\small
+\caption{Cross-market transfer on matched destination sessions. The MSE and QLIKE conclusions need not agree.}
+\begin{tabular}{llrrr}\toprule
+Evaluation destination & Training market & $n$ & QLIKE & MSE\\\midrule
+TASI & S\&P 500 & 491 & -8.7119 & $8.00\times10^{-8}$\\
+TASI & TASI & 491 & -8.6814 & $7.14\times10^{-8}$\\
+S\&P 500 & TASI & 494 & -8.4652 & $1.81\times10^{-7}$\\
+S\&P 500 & S\&P 500 & 494 & -8.4673 & $2.22\times10^{-7}$\\\bottomrule
+\end{tabular}\end{table}
+For TASI, the transferred RF achieved lower QLIKE but higher MSE than the local RF. For the S\&P 500, local training edged out transfer on QLIKE, whereas transfer obtained lower MSE. This check concerns two source-market distributions and should not be interpreted as evidence of a market-invariant transferable process.
+
+\subsection{Independent GARCH estimation and loss robustness}
+An independent GARCH fit was performed with the Python \texttt{arch} package on the first 70\% of each return history. When evaluated under the study's initialization, fitted objective-function differences relative to the archived implementation were approximately $1.28\times10^{-7}$ for the S\&P 500 and $1.01\times10^{-4}$ for TASI. This establishes a numerical implementation cross-check at the stated initialization, not uncertainty intervals for the estimated GARCH parameters.
+
+The historical RF-minus-EWMA bootstrap comparisons are pointwise 95\% moving-block intervals within each historical fold. After controlling multiplicity across the 60 original model-pair tests, these RF-versus-EWMA differences were not statistically decisive. Sensitivity to block lengths five and twenty yielded 13 adjusted significant original-model contrasts in each setting, again involving log-target boosting. The 2026 DM and MCS analyses in the following sections are separate experiments on subsequent prices, not a post hoc re-labeling of those historical intervals.
+
+\section{Later 2026 forecasts: expanded nine-model comparison}
+The five originally reported later-period QLIKE values were reproduced to four decimal places in both markets. The three historical benchmarks omitted from that later comparison---Gaussian GARCH(1,1), random forest and RV20---have now been refitted on the identical archived training origins, with one-origin embargo, and evaluated on the \emph{same} 195 S\&P 500 and 188 TASI target sessions. The full matched panel has 3,447 daily predictions (nine models per session). The matched nine-model comparison establishes the descriptive rankings relative to the full candidate set, rather than a subset of the original benchmarks.
+\begin{table}[htbp]\centering\small
+\caption{2026 full matched nine-model evaluation. MSE values are multiplied by $10^8$; bold QLIKE values denote the descriptive within-market minimum, not statistical significance.}\label{tab:later}
+\setlength{\tabcolsep}{5pt}\begin{tabular}{lrrrr}\toprule
+ & \multicolumn{2}{c}{S\&P 500 ($n=195$)} & \multicolumn{2}{c}{TASI ($n=188$)} \\
+Model & QLIKE & MSE$\times10^8$ & QLIKE & MSE$\times10^8$\\\midrule
+Poisson & \textbf{-8.5879} & 1.327 & -8.7084 & 1.686 \\
+GARCH & -8.5868 & 1.329 & -8.8079 & 1.524 \\
+EWMA & -8.5816 & 1.297 & -8.7774 & 1.656 \\
+HAR-SR2 & -8.5781 & 1.411 & -8.7898 & 1.424 \\
+Direct mean & -8.5784 & 1.326 & 9,336.0379 & 2.044 \\
+RF & -8.5534 & 1.341 & \textbf{-8.8094} & 1.640 \\
+RV20 & -8.5109 & 1.354 & -8.7787 & 1.647 \\
+Rescaled log & -8.4697 & 2.060 & -8.6471 & 2.451 \\
+Log target & -5.1597 & 1.528 & -6.6184 & 2.048 \\
+\bottomrule\end{tabular}\end{table}
+On the expanded candidate panel, the S\&P 500 Poisson mean QLIKE ($-8.5879$) is only $0.0011$ below GARCH ($-8.5868$). In TASI, random forest ($-8.8094$) narrowly leads GARCH ($-8.8079$), followed by HAR-SR2 ($-8.7898$). HAR remains the lowest-MSE model in TASI ($1.4241\times10^{-8}$), illustrating the difference between the QLIKE and MSE rankings. All these rankings are retrospective, conditional on this sample and model universe.
+\paragraph{Forecast-floor sensitivity in TASI.} Four direct-mean predictions are clipped to the stated $10^{-9}$ scoring floor. The four daily QLIKE values together contribute $9{,}344.65$ to the 188-day \emph{average}, while all remaining days contribute $-8.61$, yielding the reported mean of $9{,}336.04$. Thus the massive mean is driven by four observations, rather than uniform underperformance on all days. Excluding this model in MCS is reported as a candidate-set sensitivity analysis, not an unnoticed data-cleaning decision.
+\begin{figure}[htbp]\centering\includegraphics[width=.71\linewidth]{figures/study2/tasi_direct_mean_loss_nonfloor.pdf}
+\caption{Distribution of daily direct-mean QLIKE for TASI, excluding the four floor-hit observations from the histogram \emph{only}. All 188 observations remain in the reported score table and full-candidate inferential calculations.}\end{figure}
+
+\section{Paired uncertainty, Diebold--Mariano tests, and multiplicity}
+For the original six-model 2026 panel, and then the expanded nine-model panel, define the session-by-session loss difference $d_t=L(Y_t,\widehat h^A_t)-L(Y_t,\widehat h^B_t)$. We report the sample mean $\bar d$, a pointwise 95\% interval from 4,000 circular moving-block bootstrap replicates (10-session blocks), and a two-sided Diebold--Mariano equal-loss test using a Bartlett HAC long-run variance estimator with 10 lags and a standard-normal reference. The original six-model contrast family has 15 tests per market (Holm within market); the new expanded analysis has 36 pairs per market and applies Holm across all 72 tests. These are separately defined exploratory families; neither adjustment accounts for the broader sequence of model-development decisions. Pointwise intervals are not simultaneous intervals and must not be interpreted as Holm-adjusted significance tests.
+
+\begin{table}[ht]
+\centering\scriptsize
+\caption{Selected 2026 paired QLIKE comparisons restricted to the original six-model candidate family; Holm adjustment is across 15 pairs per market. A negative $A-B$ difference favors $A$.}\label{tab:dm}
+\resizebox{\linewidth}{!}{\begin{tabular}{llrrrr}\toprule
+Market & Pair ($A-B$) & Mean difference & Pointwise 95\% CI & DM $p$ & Holm $p$\\\midrule
+S\&P 500 & Poisson--EWMA & -0.0063 & [-0.0833, +0.0679] & 0.878 & 1.000 \\
+S\&P 500 & HAR-SR2--EWMA & +0.0035 & [-0.0385, +0.0416] & 0.871 & 1.000 \\
+S\&P 500 & HAR-SR2--Poisson & +0.0098 & [-0.0511, +0.0765] & 0.765 & 1.000 \\
+TASI & HAR-SR2--EWMA & -0.0124 & [-0.1297, +0.0893] & 0.821 & 1.000 \\
+TASI & HAR-SR2--Poisson & -0.0814 & [-0.1556, -0.0148] & 0.030 & 0.331 \\
+TASI & EWMA--Poisson & -0.0691 & [-0.1965, +0.0569] & 0.291 & 1.000 \\
+\bottomrule\end{tabular}}
+\end{table}
+
+In S\&P 500, the differences between Poisson, EWMA, and HAR-SR2 have intervals spanning zero. In TASI, the HAR-minus-Poisson interval is entirely negative, $[-0.1556,-0.0148]$, and the unadjusted DM $p=0.030$; after correction across the market's 15 pairs, $p_{\mathrm{Holm}}=0.331$, so an adjusted superiority claim is not supported. Neither the HAR-versus-EWMA nor the Poisson-versus-EWMA contrasts establishes superiority after the same adjustment.
+
+\subsection{New inference on all nine models}
+The expanded nine-model family contains $\binom{9}{2}=36$ model pairs per market, or 72 comparisons across the two markets. Daily losses are matched to exactly the same target sessions. We recomputed paired 95\% circular moving-block percentile intervals (3,999 replicates, ten-session blocks), two-sided equal-accuracy Diebold--Mariano tests with Bartlett HAC lag ten, and \emph{Holm-adjusted $p$-values across all 72 tests}. The original six-model results are retained above for methodological continuity, but their 15-test Holm values are not silently substituted for the larger family.
+\begin{table}[htbp]\centering\scriptsize
+\caption{Selected contrasts from the complete nine-model family. Negative loss differences favor the first-listed model. Intervals are nominal \emph{pointwise} 95\%, and corrected $p$-values belong to the 72-test family.}\label{tab:dm-expanded}
+\resizebox{\linewidth}{!}{\begin{tabular}{llrlll}\toprule
+Market & Model pair ($A-B$) & Mean difference & Pointwise 95\% CI & DM $p$ & Holm $p$ (72)\\\midrule
+S\&P 500 & Poisson--GARCH & -0.0011 & [-0.0906, +0.0769] & 0.980 & 1.000 \\
+S\&P 500 & Poisson--EWMA & -0.0063 & [-0.0833, +0.0679] & 0.878 & 1.000 \\
+TASI & RF--GARCH & -0.0016 & [-0.0562, +0.0624] & 0.959 & 1.000 \\
+TASI & RF--HAR-SR2 & -0.0197 & [-0.0683, +0.0365] & 0.445 & 1.000 \\
+TASI & RF--EWMA & -0.0320 & [-0.1069, +0.0390] & 0.391 & 1.000 \\
+TASI & HAR-SR2--GARCH & +0.0181 & [-0.0307, +0.0651] & 0.466 & 1.000 \\
+\bottomrule\end{tabular}}\end{table}
+This expanded nine-model analysis uses 3,999 circular moving-block bootstrap replicates per contrast; it is distinct from the original six-model MCS audit, which used 4,999 replicates in the official R package. The small differences among the top models are not statistically decisive. In S\&P 500, Poisson minus GARCH has pointwise 95\% CI $[-0.0906,0.0769]$; in TASI, RF minus HAR has CI $[-0.0683,0.0365]$, and RF minus GARCH has CI $[-0.0562,0.0624]$. All include zero. Thus the change in the TASI descriptive leader is important to report, but does \emph{not} establish RF superiority over HAR, GARCH or EWMA. All 72 model-pair estimates and their dependence-aware uncertainties accompany the source archive and appear in the extended appendix.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.92\linewidth]{figures/study2/SP500_contrasts_2026.pdf}
+\caption{Selected pointwise paired 95\% block-bootstrap intervals, S\&P 500. The dashed line marks equal mean QLIKE.}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.92\linewidth]{figures/study2/TASI_contrasts_2026.pdf}
+\caption{Selected pointwise paired 95\% block-bootstrap intervals, TASI. No multiplicity correction is applied to these plotted intervals.}
+\end{figure}
+
+\section{Sequential model confidence set and sensitivity}
+For the \emph{original six-model panel only}, we implement a sequential $T_{\max}$ \emph{MCS-style} elimination procedure with a centered circular moving-block bootstrap (4,000 replicates, block length 10) at nominal confidence level 95\%. The separate expanded nine-model custom MCS analyses use 3,999 replicates; the six- and nine-model official R verifications each use 4,999 replicates per run. These replicate counts refer to different calculations and must not be interchanged. The test compares all candidates at common forecast origins within each market and eliminates the model with the largest positive studentized loss contrast only when a bootstrap equal-predictive-ability null is rejected. The resulting set contains models \emph{not eliminated} at that test level; it is not a ranking of models with proven equivalence.
+
+\begin{table}[ht]
+\centering\small
+\caption{Original six-model 2026 MCS-style retained models by market (custom Python; not the expanded nine-model candidate set).}\label{tab:mcs}
+\begin{tabularx}{\linewidth}{@{}llX@{}}\toprule
+Procedure & Market & Retained models\\\midrule
+Full six, block 10 & S\&P 500 & Direct mean, EWMA, HAR, Poisson, rescaled log\\
+Full six, block 10 & TASI & All six models\\
+Full six, block 5 & S\&P 500 & Direct mean, EWMA, HAR, Poisson, rescaled log\\
+Full six, block 5 & TASI & All six models\\
+Full six, block 20 & S\&P 500 & Direct mean, EWMA, HAR, Poisson\\
+Full six, block 20 & TASI & All six models\\
+Exclude direct mean, block 10 & S\&P 500 & EWMA, HAR, Poisson, rescaled log\\
+Exclude direct mean, block 10 & TASI & EWMA, HAR, Poisson, rescaled log\\
+\bottomrule\end{tabularx}
+\end{table}
+
+The extremely large TASI direct-mean losses arise from a small number of floor hits and materially distort the resampled comparison distribution. Therefore the full candidate set and the exclusion sensitivity must be interpreted together. Retention in a very wide confidence set is \emph{not} positive evidence of equal forecast accuracy.
+
+\section{Verification, limitations, and interpretation}
+The input audit checked valid unique dates, strictly positive closing prices, exact equality of overlapping price records, the six blank non-trading FRED entries, and exactly 195/188 out-of-archive target sessions. Independently fitting HAR with \texttt{statsmodels} produced coefficient differences below $4\times10^{-16}$ and forecast differences below $10^{-16}$; all ten original later-model scores match the published estimates to four decimals, including the corrected Poisson predictions. Every origin in the expanded panel has nine positive forecasts and a common realized squared return. The 26 tests in the distributed release suite passed. Results, source checks, model coefficients, and complete daily forecast/loss tables are archived in the accompanying code package.
+
+These comparisons measure a single retrospective later period, with the models and follow-up diagnostics chosen after other periods were examined. The cross-language MCS verification is described below; its results and inferential boundaries are specified in Section~\ref{sec:independent_mcs}. Volatility-proxy noise, data-vendor adjustments, trading-calendar differences, extreme QLIKE tails, and the bootstrap block/HAC choices limit generalization. The report presents no prospective or investor-utility claim. A further untouched evaluation period or common intraday realized-variance targets would be useful extensions. Study II remains a statistical forecasting work sample, not a peer-reviewed methods contribution.
+
+
+\section{Official R package validation of MCS results}\label{sec:official_rmcs}
+The original six-model MCS analysis was additionally validated against an \emph{actual,
+completed} Google Colab execution of the CRAN \texttt{MCS} package (version
+0.2.1, R version 4.6.1). This is a third-party software-package check, not
+simply a second implementation in a different language. The researcher supplied
+the raw \texttt{R\_MCS\_validation\_results.zip}, containing the package's
+serialized objects, human-readable case reports, session information, loss
+matrices, and execution status. The resulting 36 cases cover two markets,
+three candidate sets, two statistics ($T_{\max}$ and $T_R$), and block lengths
+5, 10 and 20, with $B=4{,}999$ and $\alpha=0.05$. All 36 completed without
+software errors. The original evaluation includes 195 S\&P 500 and 188 TASI
+sessions, with identical dates across models within each market.
+
+We independently recalculated every QLIKE value from the archived individual
+forecasts in Python and compared it with the R-produced daily loss matrices.
+The maximum absolute discrepancy was $2.35\times10^{-11}$ for S\&P 500 and
+$6.8\times10^{-8}$ for TASI (the latter reflecting floating-point precision for an extreme
+QLIKE observation). Thus the two boundary disagreements below are \emph{not}
+caused by differences in the outcome series or scoring rule.
+
+\begin{table}[ht]
+\centering\small
+\caption{Official R \texttt{MCS} retained sets for the baseline 10-session block
+($B=4{,}999$; all runs at 95\% confidence). ``Core'' denotes EWMA,
+HAR-SR2, Poisson and rescaled log.}\label{tab:official_R}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllll}\toprule
+Market & Candidates & $T_{\max}$ retained & $T_R$ retained & Conclusion \\\midrule
+S\&P 500 & All six & All except log target & All except log target & Both exclude log target \\
+S\&P 500 & No direct mean & All except log target & All except log target & Both exclude log target \\
+S\&P 500 & Four core & All four & All four & No exclusion \\
+TASI & All six & All six & All except log target & Statistic-dependent \\
+TASI & No direct mean & All except log target & All except log target & Both exclude log target \\
+TASI & Four core & All four & All four & No exclusion \\
+\bottomrule\end{tabular}}
+\end{table}
+
+Official R and the earlier custom Python circular-bootstrap MCS have the
+\emph{same retained sets in 34 out of 36 cases}. The two exceptions both occur
+for S\&P 500, $T_R$ and 20-session blocks: after excluding direct mean,
+the R MCS $p$-value for rescaled log is $0.0594$, while in the four-core
+analysis it is $0.0562$. Both exceed $0.05$, so R \emph{retains} rescaled
+log in these cases; the custom Python implementation had eliminated it.
+
+\begin{table}[ht]
+\centering\small
+\caption{The two borderline disagreements for S\&P 500, $T_R$, block length 20.}
+\label{tab:rmcs_differences}
+\begin{tabular}{p{.37\linewidth}p{.27\linewidth}p{.22\linewidth}}\toprule
+Candidate set & Official R, rescaled-log MCS $p$ & Custom Python decision \\\midrule
+Exclude direct mean & 0.0594; retain & Eliminate \\
+Four core models & 0.0562; retain & Eliminate \\
+\bottomrule\end{tabular}
+\end{table}
+
+The package bootstrap and the custom implementation are not identical
+resampling procedures; the bootstrap seeds also differ. Consequently exact
+$p$-value equality is not an appropriate criterion. The near-boundary mismatch
+is an important robustness qualifier, not a software failure. For independent
+software-package conclusions, the official R output is the reported reference;
+the custom Python, JavaScript and stationary-bootstrap results remain sensitivity
+analyses. In \emph{every one of the 36 official R cases}, EWMA, HAR-SR2 and
+Poisson remain in the retained set. This shows only failure to exclude these
+models with the stated sample and tests, \emph{not} equivalence or proof of
+optimality. The exceptional TASI direct-mean QLIKE values make candidate-set
+sensitivity especially important.
+
+
+\FloatBarrier
+\section{Independent MCS algorithm audit and sensitivity}\label{sec:independent_mcs}
+We verified the 2026 MCS calculations independently of the original
+\texttt{study2\_}\allowbreak\texttt{extension.py} implementation. Separate NumPy and Node.js/JavaScript
+programs read only the archived origin-level realized squared returns and six
+positive forecasts; both reconstructed the QLIKE losses, then independently
+implemented sequential MCS inference. The implementations are not thin wrappers
+around the original code, and they use separate pseudorandom number generators.
+For the baseline circular-block calculations, \emph{24 of 24} model-set outputs
+matched exactly between Python and JavaScript (two markets, two candidate sets,
+two statistics, three block lengths). This constitutes cross-language algorithmic
+verification. A subsequent independent execution of the official R \texttt{MCS}
+package in Google Colab was supplied and inspected; see Section~\ref{sec:official_rmcs}.
+The third-party Python \texttt{arch} MCS implementation was not executed.
+
+The original $T_{\max}$ statistic uses each model's standardized mean excess
+QLIKE relative to its current candidate-set average. We also evaluated the
+pairwise range statistic $T_R$, each with a sequential elimination rule as in
+Hansen, Lunde and Nason (2011). Both a circular fixed-block bootstrap and a
+stationary bootstrap were examined, using 4,999 replications, five-, ten-, and
+twenty-session mean block lengths, and a 5\% nominal test level. Joint resampling
+of all models retains paired daily dependence. The same bootstrap draws are
+reused at every elimination step of a given run. Numerical $p$-values depend
+on the bootstrap scheme and random seed.
+
+\begin{table}[ht]
+\centering\small
+\caption{Independently reproduced 2026 MCS results (circular bootstrap, block 10;
+4,999 replicates). Retained-model lists are ordered alphabetically.}\label{tab:indmcs}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllll}\toprule
+Market & Candidates & Statistic & First-stage $p$ & Retained models \\\midrule
+S\&P 500 & Six & $T_{\max}$ & 0.0002 & Direct mean, EWMA, HAR, Poisson, rescaled log \\
+S\&P 500 & Six & $T_R$ & 0.0002 & Direct mean, EWMA, HAR, Poisson, rescaled log \\
+TASI & Six & $T_{\max}$ & 0.2304 & All six \\
+TASI & Six & $T_R$ & 0.0284 & Direct mean, EWMA, HAR, Poisson, rescaled log \\
+S\&P 500 & No direct mean & $T_{\max}$ & 0.0002 & EWMA, HAR, Poisson, rescaled log \\
+S\&P 500 & No direct mean & $T_R$ & 0.0002 & EWMA, HAR, Poisson, rescaled log \\
+TASI & No direct mean & $T_{\max}$ & 0.0126 & EWMA, HAR, Poisson, rescaled log \\
+TASI & No direct mean & $T_R$ & 0.0272 & EWMA, HAR, Poisson, rescaled log \\
+\bottomrule\end{tabular}}
+\end{table}
+
+The six-model TASI result is sensitive to the test statistic: $T_{\max}$
+retains all six candidates, whereas $T_R$ excludes the log-target model.
+Removing direct mean---which had four forecast-floor hits and extreme
+QLIKE losses---leads both tests to exclude log target in TASI. In the custom circular-bootstrap S\&P 500 six-model analysis, raising the block
+length from 10 to 20 excludes rescaled log. The official R verification confirms
+this for the six-model analysis but identifies near-threshold differences for
+two smaller candidate sets, discussed in Section~\ref{sec:official_rmcs}.
+Repeating the full grid with stationary rather than circular resampling preserved
+the stable core of EWMA, HAR and Poisson, although the wider set is not completely
+invariant. A retained model is \emph{not proven equivalent or optimal}; these are
+models not eliminated by these tests on this sample.
+
+
+
+\section{Expanded nine-model MCS: completed official R validation}\label{sec:expanded_mcs}
+The independent CRAN \texttt{MCS} package was executed on the \emph{expanded nine-model} 2026 panel in a separate Google Colab R environment. Its archived output contains 24 successful runs (two markets, nine or eight candidates, $T_{\max}$ or $T_R$, and block lengths $k\in\{5,10,20\}$). The software was R 4.6.1 with \texttt{MCS} version 0.2.1; all runs used $\alpha=0.05$ and $B=4{,}999$ bootstrap replications with recorded random seeds. The original forecast files contribute 195 S\&P 500 and 188 TASI matched target sessions; each daily squared-return target is scored for the nine candidate forecasts without reordering or deleting observations. The full original R-produced case reports, \texttt{.rds} model objects, daily QLIKE matrices, modelwise MCS $p$-values and \texttt{sessionInfo()} are supplied in the reproducibility archive.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{\emph{Official R} \texttt{MCS} model eliminations in the 2026 nine- and eight-model comparisons ($\alpha=0.05$, 4,999 replicates). An empty exclusion set means that every candidate survives; $k$ is bootstrap block length.}\label{tab:official_R_nine}
+\begin{tabular}{@{}llcll@{}}\toprule
+Market & Candidates & $k$ & $T_{\max}$ excludes & $T_R$ excludes\\\midrule
+S\&P 500 & All 9 & 5 & Log target & Log target \\
+S\&P 500 & All 9 & 10 & Log target & Log target \\
+S\&P 500 & All 9 & 20 & Log target & Log target \\
+\addlinespace[2pt]
+S\&P 500 & 8, no Direct mean & 5 & Log target & Log target \\
+S\&P 500 & 8, no Direct mean & 10 & Log target & Log target \\
+S\&P 500 & 8, no Direct mean & 20 & Log target & Log target \\
+\addlinespace[2pt]
+TASI & All 9 & 5 & None & None \\
+TASI & All 9 & 10 & None & Log target \\
+TASI & All 9 & 20 & None & Log target \\
+\addlinespace[2pt]
+TASI & 8, no Direct mean & 5 & Log target & None \\
+TASI & 8, no Direct mean & 10 & Log target & Log target \\
+TASI & 8, no Direct mean & 20 & Log target & Log target \\
+\addlinespace[2pt]
+\bottomrule\end{tabular}
+\end{table}
+\FloatBarrier
+
+For the S\&P 500, \emph{Log Target} was excluded in all 12 official nine/eight-model settings, irrespective of the statistic or block length. The surviving set therefore contains eight models with Direct Mean, or seven without it. For TASI, $T_{\max}$ retained all nine candidates when Direct Mean was included, whereas $T_R$ retained all nine at $k=5$ and excluded Log Target at $k=10$ and 20. In the eight-candidate sensitivity excluding Direct Mean, $T_{\max}$ always excluded Log Target, while $T_R$ retained it at $k=5$ but excluded it at $k=10$ and 20. The borderline TASI Log Target MCS $p$-values were 0.0540 (all nine) and 0.0562 (eight) for $T_R$ at $k=5$, compared with 0.0246 and 0.0242 at $k=10$. These differences show sensitivity to the candidate universe and bootstrap block length, particularly given the four extreme-loss Direct Mean forecasts; they are not a model-ranking paradox or evidence of equivalence.
+
+\paragraph{Numerical and algorithmic verification.} Recalculation of all 18 market--model mean QLIKE values directly from the 3,447 archived daily predictions agreed with R within $3.7\times10^{-12}$ in absolute arithmetic error; daily loss-matrix agreement was also checked. The official output contains 204 modelwise decision records with consistent 5\% retention status. Across the twelve comparable $T_{\max}$ settings, \emph{all twelve} official R retained sets agreed with the previously archived custom Python procedure, despite different bootstrap engines and random streams. The twelve $T_R$ runs are additional official-package checks; they were not represented in the custom nine-model $T_{\max}$ comparison. The separate six-model audit (36 R runs, 34 retained-set agreements with custom Python) remains a distinct experiment, rather than being silently pooled with this nine-model audit.
+
+The official R membership decisions in Table~\ref{tab:official_R_nine} are the primary package-based sensitivity results for the nine-model panel; the custom Python model sets serve as a cross-implementation check. The model confidence set reports non-elimination under a specified procedure and sample, \emph{not} superiority, equivalence or guaranteed future performance. These analyses remain retrospective and exploratory.
+
+\section{Limitations and prospective evaluation}\label{sec:prospective}
+Cross-language replication and the completed official-package tests strengthen
+computational credibility, but they do not address all inferential uncertainty.
+The January--October 2026 evaluation is retrospective: earlier results were
+inspected during methodological development, and additional candidates and
+sensitivity settings were examined. Reported multiplicity adjustments apply
+to their specified comparison families and do not correct for the entire
+model-development sequence. Thus these analyses support exploratory
+comparisons, not conclusions from an independently preregistered prospective
+test.
+
+A prospective validation protocol specifies market sessions from 1 December
+2026 through 30 November 2027. Its fixed forecasting designs cover EWMA,
+HAR-SR2, Poisson and rescaled log; $T_R$ with stationary-block resampling is
+the primary MCS test, with alternative candidate panels and $T_{\max}$ as
+sensitivity analyses. Forecasts must be timestamped before target returns
+are known, and model selection cannot use future targets. This protocol is a
+\emph{draft}, not an externally preregistered study, and contains \emph{no}
+prospective results. The protocol and data-provenance rules accompany the
+source archive. Independent registration before data collection, replication,
+and peer review remain necessary.
+
+\clearpage
+\section*{Appendix: Complete 2026 nine-model paired comparisons}
+\addcontentsline{toc}{section}{Appendix: Complete nine-model paired comparisons}
+The table enumerates all 72 model pairs of the two 2026 markets (36 per market) for the \emph{expanded} nine-model universe. All differences are model $A$ minus model $B$ in daily QLIKE, so negative values favor $A$. The intervals are pointwise circular moving-block percentiles (3,999 replicates; block length 10); tests use two-sided Diebold--Mariano HAC with ten Bartlett lags, and \emph{Holm correction covers 72 comparisons across both markets}. Full-precision numbers and alternate block lengths are in the companion CSV. ``Direct'' indicates the direct-mean model, ``HAR'' HAR-SR2, ``R-log'' the training-rescaled log forecast, and ``Log'' the direct log-target model. The extreme Direct-mean TASI differences are not rounded away or filtered out.
+\begingroup\small\setlength{\tabcolsep}{4.2pt}\renewcommand{\arraystretch}{1.09}
+\begin{longtable}{@{}lrlll@{}}
+\caption{S\&P 500 --- 36 paired QLIKE comparisons (2026); pointwise 95\% intervals; Holm adjusted over both markets.}\label{tab:all-dm-expanded}\\
+\toprule Pair ($A-B$) & Mean $A-B$ & Pointwise 95\% CI & DM $p$ & Holm $p$ (72)\\\midrule\endfirsthead
+\multicolumn{5}{l}{\footnotesize Continued: S\&P 500 pairwise 2026 comparisons}\\\toprule
+Pair ($A-B$) & Mean $A-B$ & Pointwise 95\% CI & DM $p$ & Holm $p$ (72)\\\midrule\endhead
+Direct--EWMA & +0.0032 & [-0.0651, +0.0777] & 0.929 & 1.000 \\
+Direct--GARCH & +0.0084 & [-0.0461, +0.0676] & 0.761 & 1.000 \\
+Direct--HAR & -0.0003 & [-0.0628, +0.0765] & 0.993 & 1.000 \\
+Direct--Log & -3.4187 & [-4.7747, -2.2463] & 4.9e-08 & 3.5e-06 \\
+Direct--Poisson & +0.0095 & [-0.0934, +0.1449] & 0.874 & 1.000 \\
+Direct--RF & -0.0249 & [-0.0726, +0.0188] & 0.278 & 1.000 \\
+Direct--RV20 & -0.0675 & [-0.1308, -0.0087] & 0.038 & 1.000 \\
+Direct--R-log & -0.1087 & [-0.1942, -0.0286] & 0.011 & 0.666 \\
+EWMA--GARCH & +0.0052 & [-0.0277, +0.0408] & 0.776 & 1.000 \\
+EWMA--HAR & -0.0035 & [-0.0416, +0.0385] & 0.871 & 1.000 \\
+EWMA--Log & -3.4219 & [-4.8370, -2.2203] & 1.1e-07 & 7.7e-06 \\
+EWMA--Poisson & +0.0063 & [-0.0679, +0.0833] & 0.878 & 1.000 \\
+EWMA--RF & -0.0281 & [-0.0897, +0.0271] & 0.332 & 1.000 \\
+EWMA--RV20 & -0.0707 & [-0.1418, -0.0113] & 0.035 & 1.000 \\
+EWMA--R-log & -0.1119 & [-0.2272, -0.0086] & 0.045 & 1.000 \\
+GARCH--HAR & -0.0087 & [-0.0405, +0.0272] & 0.619 & 1.000 \\
+GARCH--Log & -3.4271 & [-4.8364, -2.2277] & 1e-07 & 6.9e-06 \\
+GARCH--Poisson & +0.0011 & [-0.0769, +0.0906] & 0.980 & 1.000 \\
+GARCH--RF & -0.0334 & [-0.0755, +0.0100] & 0.144 & 1.000 \\
+GARCH--RV20 & -0.0759 & [-0.1435, -0.0172] & 0.024 & 1.000 \\
+GARCH--R-log & -0.1171 & [-0.2201, -0.0255] & 0.017 & 0.923 \\
+HAR--Log & -3.4184 & [-4.8506, -2.2075] & 1.6e-07 & 1e-05 \\
+HAR--Poisson & +0.0098 & [-0.0511, +0.0765] & 0.765 & 1.000 \\
+HAR--RF & -0.0246 & [-0.0885, +0.0304] & 0.430 & 1.000 \\
+HAR--RV20 & -0.0672 & [-0.1577, +0.0111] & 0.126 & 1.000 \\
+HAR--R-log & -0.1084 & [-0.2249, -0.0053] & 0.050 & 1.000 \\
+Log--Poisson & +3.4282 & [+2.1732, +4.9067] & 4.2e-07 & 2.7e-05 \\
+Log--RF & +3.3938 & [+2.2148, +4.7645] & 7.9e-08 & 5.6e-06 \\
+Log--RV20 & +3.3512 & [+2.1648, +4.7349] & 1.1e-07 & 7.5e-06 \\
+Log--R-log & +3.3100 & [+2.1687, +4.6242] & 7.9e-08 & 5.6e-06 \\
+Poisson--RF & -0.0344 & [-0.1545, +0.0683] & 0.554 & 1.000 \\
+Poisson--RV20 & -0.0770 & [-0.2100, +0.0313] & 0.227 & 1.000 \\
+Poisson--R-log & -0.1182 & [-0.2783, +0.0179] & 0.103 & 1.000 \\
+RF--RV20 & -0.0425 & [-0.1098, +0.0154] & 0.191 & 1.000 \\
+RF--R-log & -0.0838 & [-0.1876, +0.0106] & 0.107 & 1.000 \\
+RV20--R-log & -0.0412 & [-0.1554, +0.0605] & 0.471 & 1.000 \\
+\bottomrule\end{longtable}\endgroup
+\clearpage\begingroup\small\setlength{\tabcolsep}{4.2pt}\renewcommand{\arraystretch}{1.09}
+\begin{longtable}{@{}lrlll@{}}
+\caption{TASI --- 36 paired QLIKE comparisons (2026); pointwise 95\% intervals; Holm adjusted over both markets.}\label{tab:all-dm-expanded-tasi}\\
+\toprule Pair ($A-B$) & Mean $A-B$ & Pointwise 95\% CI & DM $p$ & Holm $p$ (72)\\\midrule\endfirsthead
+\multicolumn{5}{l}{\footnotesize Continued: TASI pairwise 2026 comparisons}\\\toprule
+Pair ($A-B$) & Mean $A-B$ & Pointwise 95\% CI & DM $p$ & Holm $p$ (72)\\\midrule\endhead
+Direct--EWMA & +9,344.8 & [-0.0335, +28,032.5] & 0.294 & 1.000 \\
+Direct--GARCH & +9,344.8 & [-0.0386, +28,032.6] & 0.294 & 1.000 \\
+Direct--HAR & +9,344.8 & [-0.0526, +28,032.6] & 0.294 & 1.000 \\
+Direct--Log & +9,342.7 & [-1.6029, +28,028.5] & 0.294 & 1.000 \\
+Direct--Poisson & +9,344.7 & [-0.1269, +28,032.4] & 0.294 & 1.000 \\
+Direct--RF & +9,344.8 & [-0.0131, +28,032.6] & 0.294 & 1.000 \\
+Direct--RV20 & +9,344.8 & [-0.0467, +28,032.5] & 0.294 & 1.000 \\
+Direct--R-log & +9,344.7 & [-0.0901, +28,032.2] & 0.294 & 1.000 \\
+EWMA--GARCH & +0.0304 & [-0.0646, +0.1482] & 0.580 & 1.000 \\
+EWMA--HAR & +0.0124 & [-0.0893, +0.1297] & 0.821 & 1.000 \\
+EWMA--Log & -2.1590 & [-4.0169, -0.9031] & 0.010 & 0.618 \\
+EWMA--Poisson & -0.0691 & [-0.1965, +0.0569] & 0.291 & 1.000 \\
+EWMA--RF & +0.0320 & [-0.0390, +0.1069] & 0.391 & 1.000 \\
+EWMA--RV20 & +0.0013 & [-0.0718, +0.0565] & 0.969 & 1.000 \\
+EWMA--R-log & -0.1303 & [-0.3529, +0.0436] & 0.204 & 1.000 \\
+GARCH--HAR & -0.0181 & [-0.0651, +0.0307] & 0.466 & 1.000 \\
+GARCH--Log & -2.1895 & [-4.1631, -0.8704] & 0.013 & 0.745 \\
+GARCH--Poisson & -0.0995 & [-0.1993, -0.0059] & 0.055 & 1.000 \\
+GARCH--RF & +0.0016 & [-0.0624, +0.0562] & 0.959 & 1.000 \\
+GARCH--RV20 & -0.0292 & [-0.1766, +0.0886] & 0.658 & 1.000 \\
+GARCH--R-log & -0.1607 & [-0.4518, +0.0262] & 0.225 & 1.000 \\
+HAR--Log & -2.1714 & [-4.1192, -0.8517] & 0.013 & 0.763 \\
+HAR--Poisson & -0.0814 & [-0.1556, -0.0148] & 0.030 & 1.000 \\
+HAR--RF & +0.0197 & [-0.0365, +0.0683] & 0.445 & 1.000 \\
+HAR--RV20 & -0.0111 & [-0.1624, +0.1163] & 0.873 & 1.000 \\
+HAR--R-log & -0.1426 & [-0.4197, +0.0396] & 0.259 & 1.000 \\
+Log--Poisson & +2.0900 & [+0.7616, +4.0208] & 0.015 & 0.867 \\
+Log--RF & +2.1910 & [+0.8895, +4.1150] & 0.011 & 0.666 \\
+Log--RV20 & +2.1603 & [+0.8965, +4.0515] & 0.011 & 0.666 \\
+Log--R-log & +2.0287 & [+0.8522, +3.7318] & 0.008 & 0.491 \\
+Poisson--RF & +0.1011 & [+0.0219, +0.1798] & 0.014 & 0.806 \\
+Poisson--RV20 & +0.0703 & [-0.0988, +0.2269] & 0.386 & 1.000 \\
+Poisson--R-log & -0.0612 & [-0.3027, +0.1082] & 0.573 & 1.000 \\
+RF--RV20 & -0.0307 & [-0.1473, +0.0661] & 0.558 & 1.000 \\
+RF--R-log & -0.1623 & [-0.4127, +0.0069] & 0.153 & 1.000 \\
+RV20--R-log & -0.1315 & [-0.3836, +0.0824] & 0.274 & 1.000 \\
+\bottomrule\end{longtable}\endgroup
+
+\section*{References}
+\begingroup\small\sloppy\setlength{\parskip}{5pt}
+\noindent\hangindent=1.3em\hangafter=1 Alalmai, S. (2026). Forecasting stock market volatility using GARCH models: A comparative study of the U.S. and Saudi markets. \emph{Economics and Finance Letters}, 13(1), 132--150. \url{https://doi.org/10.18488/29.v13i1.4816}.
+
+\noindent\hangindent=1.3em\hangafter=1 Bernardi, M., \& Catania, L. (2018). The model confidence set package for R. \emph{International Journal of Computational Economics and Econometrics}, 8(2), 144--158. \url{https://doi.org/10.1504/IJCEE.2018.091037}.
+
+\noindent\hangindent=1.3em\hangafter=1 Bollerslev, T. (1986). Generalized autoregressive conditional heteroskedasticity. \emph{Journal of Econometrics}, 31(3), 307--327. \url{https://doi.org/10.1016/0304-4076(86)90063-1}.
+
+\noindent\hangindent=1.3em\hangafter=1 Branco, R. R., Rubesam, A., \& Zevallos, M. (2024). Forecasting realized volatility: Does anything beat linear models? \emph{Journal of Empirical Finance}, 78, 101524. \url{https://doi.org/10.1016/j.jempfin.2024.101524}.
+
+\noindent\hangindent=1.3em\hangafter=1 Corsi, F. (2009). A simple approximate long-memory model of realized volatility. \emph{Journal of Financial Econometrics}, 7(2), 174--196. \url{https://doi.org/10.1093/jjfinec/nbp001}.
+
+\noindent\hangindent=1.3em\hangafter=1 Diebold, F. X., \& Mariano, R. S. (1995). Comparing predictive accuracy. \emph{Journal of Business \& Economic Statistics}, 13(3), 253--263. \url{https://doi.org/10.1080/07350015.1995.10524599}.
+
+\noindent\hangindent=1.3em\hangafter=1 Duan, N. (1983). Smearing estimate: A nonparametric retransformation method. \emph{Journal of the American Statistical Association}, 78(383), 605--610. \url{https://doi.org/10.1080/01621459.1983.10478017}.
+
+\noindent\hangindent=1.3em\hangafter=1 Hansen, P. R., Lunde, A., \& Nason, J. M. (2011). The model confidence set. \emph{Econometrica}, 79(2), 453--497. \url{https://doi.org/10.3982/ECTA5771}.
+
+\noindent\hangindent=1.3em\hangafter=1 Holm, S. (1979). A simple sequentially rejective multiple test procedure. \emph{Scandinavian Journal of Statistics}, 6(2), 65--70.
+
+\noindent\hangindent=1.3em\hangafter=1 Investing.com. (2026). \emph{Tadawul All Share Historical Data} [Data set]. Retrieved November 2026. \url{https://www.investing.com/indices/tasi-historical-data}.
+
+\noindent\hangindent=1.3em\hangafter=1 Patton, A. J. (2011). Volatility forecast comparison using imperfect volatility proxies. \emph{Journal of Econometrics}, 160(1), 246--256. \url{https://doi.org/10.1016/j.jeconom.2010.03.034}.
+
+\noindent\hangindent=1.3em\hangafter=1 Patton, A. J., \& Zhang, H. (2026). Bespoke realized volatility: Tailored measures of risk for volatility prediction. \emph{Journal of Econometrics}, 254, 106122. \url{https://doi.org/10.1016/j.jeconom.2025.106122}.
+
+\noindent\hangindent=1.3em\hangafter=1 Politis, D. N., \& Romano, J. P. (1992). A circular block-resampling procedure for stationary data. In R. LePage \& L. Billard (Eds.), \emph{Exploring the limits of bootstrap} (pp. 263--270). Wiley.
+
+\noindent\hangindent=1.3em\hangafter=1 Pragadeeshwaran, R. V., Tarun Narayanan, R., \& Bhavadharini, R. M. (2026). Stock-level volatility forecasting using machine learning: A comparative study of GARCH, random forest, LSTM, and GRU on US equities. \emph{PLOS One}, 21(10), e0354643. \url{https://doi.org/10.1371/journal.pone.0354643}.
+
+\noindent\hangindent=1.3em\hangafter=1 S\&P Dow Jones Indices LLC. (2026). \emph{S\&P 500 (SP500)} [Data set]. Federal Reserve Bank of St. Louis. \url{https://fred.stlouisfed.org/series/SP500}.
+\endgroup
